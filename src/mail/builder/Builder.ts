@@ -1,3 +1,3 @@
-export abstract class Builder {
-    abstract build<T>(): T;
+export abstract class Builder<T> {
+    abstract build(): T;
 }

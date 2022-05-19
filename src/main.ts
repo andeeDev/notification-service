@@ -15,10 +15,7 @@ async function bootstrap(): Promise<void> {
             prefetchCount: 1,
         },
     });
-    /* const app = await NestFactory.create(AppModule);
-     */
 
     await app.listen();
-    // await app.startAllMicroservices();
 }
 bootstrap();

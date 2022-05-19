@@ -16,12 +16,12 @@ export class MailService {
         );
     }
 
-    async sendUserConfirmation(emailMessage: EmailMessages): Promise<void> {
+    async sendUserConfirmation(emailMessages: EmailMessages): Promise<void> {
         try {
-            await this.mailjet.post('send', { version: 'v3.1' }).request(emailMessage);
-            this.logger.info(`The message was sent to ${emailMessage.Messages[0].To}`);
+            await this.mailjet.post('send', { version: 'v3.1' }).request(emailMessages);
+            this.logger.info(`The message was sent to ${emailMessages.Messages[0].To}`);
         } catch (error) {
-            this.logger.error(`The error happen sending message to ${emailMessage.Messages[0].To}, ${error.message}`);
+            this.logger.error(`The error happen sending message to ${emailMessages.Messages[0].To}, ${error.message}`);
         }
     }
 }

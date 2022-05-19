@@ -17,7 +17,7 @@ export class EmailMessageController {
     ): Promise<void> {
         const { channel, originalMessage } = this.emailMessageService.getRabbitMqOptions(context);
 
-        await this.mailService.sendUserConfirmation(new EmailMessageBuilder().buildVerification(email, code).build());
+        await this.mailService.sendUserConfirmation(new EmailMessageBuilder().buildVerification([email], code).build());
 
         channel.ack(originalMessage);
     }
