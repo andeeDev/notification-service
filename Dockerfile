@@ -1,13 +1,23 @@
-FROM node:18-alpine3.14 AS development
+FROM node:18.1.0-alpine3.14 AS build
 
-WORKDIR /usr/src/app
-
+WORKDIR /app
 COPY package*.json ./
+RUN npm i
+COPY . ./
 
-RUN npm install glob rimraf
+# build js & remove devDependencies from node_modules
+RUN npm run build && npm prune --production
 
-RUN npm install --only=development
 
-COPY . .
+FROM node:18.1.0-alpine3.14
 
-RUN npm run build
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --from=build /app/dist /app/dist
+COPY --from=build /app/node_modules /app/node_modules
+
+
+ENTRYPOINT [ "node" ]
+CMD [ "dist/main.js" ]

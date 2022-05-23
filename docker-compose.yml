@@ -2,28 +2,23 @@ version: '3.8'
 
 services:
   notification-service:
-    container_name: notification-service
-    image: nestjs_notification_service:1.0.0
+    container_name: notifications
+    image: notifications:1.0.0
     environment:
       - NODE_ENV:${NODE_ENV}
     build:
       context: .
-      args:
-        - NODE_ENV="${NODE_ENV}"
       dockerfile: ./Dockerfile
-    entrypoint: ["npm", "run", "start:debug"]
+    volumes:
+      - .:/app
+      - /app/node_modules
     env_file:
       - .env
-    ports:
-      - "8001:8001"
     networks:
-      - nesjs-network
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - nestjs-network
     restart: unless-stopped
 
 networks:
-  nesjs-network:
+  nestjs-network:
     name: nestjs-network
     external: true
