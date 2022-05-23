@@ -1,27 +1,20 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule } from '@nestjs/config';
 import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import * as winston from 'winston';
 import { EmailMessageModule } from './email-message/email-message.module';
+import { configuration } from './config/configuration';
+import { validationSchema } from './config/validation';
 
 @Module({
     imports: [
         EmailMessageModule,
         ConfigModule.forRoot({
             isGlobal: true,
+            load: [configuration],
+            validationSchema,
             envFilePath: ['.env'],
         }),
-        ClientsModule.register([
-            {
-                name: 'rabbit-mq-module',
-                transport: Transport.RMQ,
-                options: {
-                    urls: ['amqp://andee:guest@rabbitmq/notifications'],
-                    queue: 'rabbit-mq-nest-js',
-                },
-            },
-        ]),
         WinstonModule.forRoot({
             transports: [
                 new winston.transports.File({
