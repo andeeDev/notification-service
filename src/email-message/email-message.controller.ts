@@ -1,36 +1,20 @@
 import { Controller } from '@nestjs/common';
-import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
-import { MailService } from '../mail/mail.service';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { RabbitMqQueues } from '../consts/RabbitMqQueues';
-import { EmailMessageBuilder } from '../mail/builder/EmailMessageBuilder';
 import { EmailMessageService } from './email-message.service';
 import { IEmailMessage } from '../types/IEmailMessage';
 
 @Controller()
 export class EmailMessageController {
-    constructor(private readonly emailMessageService: EmailMessageService, private readonly mailService: MailService) {}
+    constructor(private readonly emailMessageService: EmailMessageService) {}
 
-    @MessagePattern(RabbitMqQueues.AccountVerification)
-    public async sendAccountVerification(
-        @Payload() { email, code }: IEmailMessage,
-        @Ctx() context: RmqContext,
-    ): Promise<void> {
-        const { channel, originalMessage } = this.emailMessageService.getRabbitMqOptions(context);
-
-        await this.mailService.sendUserConfirmation(new EmailMessageBuilder().buildVerification([email], code).build());
-
-        channel.ack(originalMessage);
+    @EventPattern(RabbitMqQueues.AccountVerification)
+    public async sendAccountVerification(@Payload() body: IEmailMessage, @Ctx() context: RmqContext): Promise<void> {
+        await this.emailMessageService.sendAccountVerification(body, context);
     }
 
-    @MessagePattern(RabbitMqQueues.ResetPassword)
-    public async sendResetPassword(
-        @Payload() { email, code }: IEmailMessage,
-        @Ctx() context: RmqContext,
-    ): Promise<void> {
-        const { channel, originalMessage } = this.emailMessageService.getRabbitMqOptions(context);
-
-        await this.mailService.sendUserConfirmation(new EmailMessageBuilder().buildReset(email, code).build());
-
-        channel.ack(originalMessage);
+    @EventPattern(RabbitMqQueues.ResetPassword)
+    public async sendResetPassword(@Payload() body: IEmailMessage, @Ctx() context: RmqContext): Promise<void> {
+        await this.emailMessageService.sentResetPassword(body, context);
     }
 }
